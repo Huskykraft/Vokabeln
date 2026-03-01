@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Spanisch Karteikarten — Anfänger</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1419;
+  --surface: #1a2027;
+  --surface2: #232d36;
+  --surface3: #2c3842;
+  --es-red: #c60b1e;
+  --es-yellow: #ffc400;
+  --de-red: #DD0000;
+  --de-gold: #FFCC00;
+  --text: #e8eaed;
+  --text-dim: #8b9298;
+  --accent: #ffc400;
+  --success: #66bb6a;
+  --warning: #ffa726;
+  --danger: #ef5350;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(198,11,30,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(255,196,0,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Layout */
+.app { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; padding: 12px 16px; min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* Header */
+.header { text-align: center; padding: 16px 0 8px; }
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--es-yellow), #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+.header .subtitle { font-size: 0.75rem; color: var(--text-dim); margin-top: 3px; letter-spacing: 0.04em; }
+.flag-bar { height: 4px; background: linear-gradient(90deg, var(--es-red) 0%, var(--es-red) 25%, var(--es-yellow) 25%, var(--es-yellow) 75%, var(--es-red) 75%); border-radius: 2px; margin: 8px 0; }
+
+/* Progress bar */
+.progress-wrap { margin: 8px 0 6px; }
+.progress-stats { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; }
+.progress-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--es-red), var(--es-yellow)); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* Controls row */
+.controls { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+.controls button, .controls select {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--surface3);
+  border-radius: 10px;
+  padding: 7px 11px;
+  font-size: 0.72rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.controls button:hover, .controls select:hover { background: var(--surface3); border-color: var(--accent); }
+.controls button.active { background: var(--es-red); border-color: var(--es-red); color: #fff; }
+.controls select { appearance: none; padding-right: 26px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b9298' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+
+/* Card area */
+.card-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1200px; padding: 6px 0; }
+
+.card-wrapper {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 3 / 2;
+  position: relative;
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-inner.flipping { transform: scaleX(0); }
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+.card-face.hidden { display: none; }
+
+.card-front {
+  background: linear-gradient(145deg, #8b0000, #c60b1e 50%, #a00a18);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.card-front::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -30%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(circle, rgba(255,196,0,0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card-back {
+  background: linear-gradient(145deg, #1a1a2e, #2d2d44 50%, #1a1a2e);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.card-back::before {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -20%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(221,0,0,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card-flag {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+.card-front .card-flag { color: var(--es-yellow); }
+.card-back .card-flag { color: var(--de-gold); }
+
+.card-number {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.65rem;
+  opacity: 0.35;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-category {
+  position: absolute;
+  bottom: 12px;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  opacity: 0.4;
+}
+
+.card-word {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  z-index: 1;
+  transition: font-size 0.2s;
+}
+.card-word.long { font-size: 1.4rem; }
+.card-word.xlong { font-size: 1.15rem; }
+
+.card-hint {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  margin-top: 6px;
+  font-style: italic;
+  z-index: 1;
+}
+
+.tap-hint {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+  opacity: 0.6;
+  text-align: center;
+}
+
+/* Action buttons */
+.actions { display: flex; gap: 8px; margin-top: 10px; width: 100%; max-width: 400px; }
+.action-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.action-btn:active { transform: scale(0.97); }
+
+.btn-wrong { background: rgba(239,83,80,0.15); color: var(--danger); }
+.btn-unsure { background: rgba(255,167,38,0.15); color: var(--warning); }
+.btn-correct { background: rgba(102,187,106,0.15); color: var(--success); }
+
+/* Navigation */
+.nav-row { display: flex; gap: 8px; margin-top: 8px; width: 100%; max-width: 400px; }
+.nav-btn {
+  flex: 1;
+  background: var(--surface2);
+  color: var(--text-dim);
+  border: 1px solid var(--surface3);
+  border-radius: 10px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Category panel */
+.category-panel {
+  display: none;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--surface3);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.category-panel.show { display: block; }
+.category-panel h3 { font-size: 0.82rem; margin-bottom: 8px; color: var(--accent); }
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.cat-btn {
+  background: var(--surface2);
+  border: 1px solid var(--surface3);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+.cat-btn.active { background: var(--es-red); border-color: var(--es-red); }
+.cat-btn .cat-count { opacity: 0.5; float: right; }
+
+/* Stats panel */
+.stats-panel {
+  display: none;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--surface3);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.stats-panel.show { display: block; }
+.stats-panel h3 { font-size: 0.82rem; margin-bottom: 8px; color: var(--accent); }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.stat-box { background: var(--surface2); border-radius: 10px; padding: 10px; text-align: center; }
+.stat-box .num { font-size: 1.4rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+.stat-box .label { font-size: 0.62rem; color: var(--text-dim); margin-top: 2px; }
+.stat-box.green .num { color: var(--success); }
+.stat-box.orange .num { color: var(--warning); }
+.stat-box.red .num { color: var(--danger); }
+
+/* Search/list mode */
+.list-panel {
+  display: none;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--surface3);
+  padding: 14px;
+  margin-bottom: 10px;
+  max-height: 55vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.list-panel.show { display: block; }
+.list-panel h3 { font-size: 0.82rem; margin-bottom: 8px; color: var(--accent); }
+.search-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--surface3);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+  outline: none;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text-dim); }
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--surface2);
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.list-item .es { color: var(--accent); font-weight: 500; }
+.list-item .de { color: var(--text-dim); }
+.list-item .status-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; margin-left: 6px; flex-shrink: 0; }
+.list-item .status-dot.green { background: var(--success); }
+.list-item .status-dot.orange { background: var(--warning); }
+.list-item .status-dot.red { background: var(--danger); }
+.list-item .status-dot.none { background: var(--surface3); }
+
+/* Completion screen */
+.complete-screen {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+}
+.complete-screen.show { display: block; }
+.complete-screen .emoji { font-size: 3rem; margin-bottom: 14px; }
+.complete-screen h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 8px; }
+.complete-screen p { color: var(--text-dim); font-size: 0.82rem; margin-bottom: 18px; }
+.complete-screen .restart-btn {
+  background: var(--es-red);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Direction indicator */
+.dir-label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-30px); }
+}
+.card-wrapper.animating-out { animation: slideOut 0.2s ease-in forwards; pointer-events: none; }
+.card-wrapper.animating-in { animation: slideIn 0.25s ease-out forwards; }
+
+/* iPhone-specific adjustments */
+@supports (-webkit-touch-callout: none) {
+  body { min-height: -webkit-fill-available; }
+}
+
+@media (max-width: 380px) {
+  .card-word { font-size: 1.6rem; }
+  .card-word.long { font-size: 1.2rem; }
+  .card-word.xlong { font-size: 1rem; }
+  .actions { gap: 5px; }
+  .action-btn { padding: 11px 6px; font-size: 0.72rem; }
+  .controls button, .controls select { padding: 6px 9px; font-size: 0.68rem; }
+}
+
+/* Safe area for iPhone X+ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .app { padding-bottom: calc(12px + env(safe-area-inset-bottom)); padding-top: calc(12px + env(safe-area-inset-top)); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>Espa&#241;ol &#x2194; Deutsch</h1>
+    <div class="subtitle">120 Karteikarten zum Lernen</div>
+  </div>
+  <div class="flag-bar"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-stats">
+      <span id="progressText">Karte 1 von 120</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="controls">
+    <button id="btnShuffle" onclick="toggleShuffle()">Mischen</button>
+    <button id="btnDirection" onclick="toggleDirection()">ES &#x2192; DE</button>
+    <button id="btnCategories" onclick="togglePanel('categories')">Kategorien</button>
+    <button id="btnStats" onclick="togglePanel('stats')">Statistik</button>
+    <button id="btnList" onclick="togglePanel('list')">Liste</button>
+    <select id="filterSelect" onchange="setFilter(this.value)">
+      <option value="all">Alle Karten</option>
+      <option value="unlearned">Noch nicht gelernt</option>
+      <option value="wrong">Falsch beantwortet</option>
+      <option value="unsure">Unsicher</option>
+      <option value="correct">Gewusst</option>
+    </select>
+  </div>
+
+  <div class="category-panel" id="categoryPanel">
+    <h3>Kategorien</h3>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+
+  <div class="stats-panel" id="statsPanel">
+    <h3>Lernfortschritt</h3>
+    <div class="stats-grid">
+      <div class="stat-box green"><div class="num" id="statCorrect">0</div><div class="label">Gewusst</div></div>
+      <div class="stat-box orange"><div class="num" id="statUnsure">0</div><div class="label">Unsicher</div></div>
+      <div class="stat-box red"><div class="num" id="statWrong">0</div><div class="label">Falsch</div></div>
+    </div>
+    <button onclick="resetProgress()" style="margin-top:10px;width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--danger);border-radius:10px;padding:8px;font-family:inherit;font-size:0.72rem;cursor:pointer;">Fortschritt zur&#252;cksetzen</button>
+  </div>
+
+  <div class="list-panel" id="listPanel">
+    <h3>Alle Karteikarten</h3>
+    <input type="text" class="search-input" id="searchInput" placeholder="Suchen..." oninput="renderList()">
+    <div id="listItems"></div>
+  </div>
+
+  <div class="card-container" id="cardArea">
+    <div class="dir-label" id="dirLabel">Spanisch &#x2192; Deutsch</div>
+    <div class="card-wrapper" id="cardWrapper" onclick="flipCard()">
+      <div class="card-inner" id="cardInner">
+        <div class="card-face card-front">
+          <div class="card-flag">Espa&#241;ol</div>
+          <div class="card-number" id="cardNumFront">#1</div>
+          <div class="card-word" id="cardFrontWord">hola</div>
+          <div class="card-hint" id="cardFrontHint"></div>
+          <div class="card-category" id="cardCatFront">Kleidung</div>
+        </div>
+        <div class="card-face card-back hidden">
+          <div class="card-flag">Deutsch</div>
+          <div class="card-number" id="cardNumBack">#1</div>
+          <div class="card-word" id="cardBackWord">hallo</div>
+          <div class="card-hint" id="cardBackHint"></div>
+          <div class="card-category" id="cardCatBack">Kleidung</div>
+        </div>
+      </div>
+    </div>
+    <div class="tap-hint" id="tapHint">Tippen zum Umdrehen</div>
+
+    <div class="actions" id="actionBtns">
+      <button class="action-btn btn-wrong" onclick="rateCard('wrong')">Falsch</button>
+      <button class="action-btn btn-unsure" onclick="rateCard('unsure')">Unsicher</button>
+      <button class="action-btn btn-correct" onclick="rateCard('correct')">Gewusst</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn" id="btnPrev" onclick="prevCard()">&#x2190; Zur&#252;ck</button>
+      <button class="nav-btn" id="btnNext" onclick="nextCard()">Weiter &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="complete-screen" id="completeScreen">
+    <div class="emoji">&#127881;</div>
+    <h2>&#161;Muy bien!</h2>
+    <p id="completeText">Du hast alle Karten durchgearbeitet.</p>
+    <button class="restart-btn" onclick="restart()">Nochmal &#252;ben</button>
+  </div>
+</div>
+
+<script>
+var allCards = [
+  // === KLEIDUNG (Ropa) ===
+  {es:"la camiseta",de:"das T-Shirt",cat:"Kleidung",hint:"[la kamis\u00e9ta]"},
+  {es:"los pantalones",de:"die Hose",cat:"Kleidung",hint:"[los pantal\u00f3nes]"},
+  {es:"el vestido",de:"das Kleid",cat:"Kleidung",hint:"[el west\u00eddo]"},
+  {es:"la falda",de:"der Rock",cat:"Kleidung",hint:"[la f\u00e1lda]"},
+  {es:"la chaqueta",de:"die Jacke",cat:"Kleidung",hint:"[la tschak\u00e9ta]"},
+  {es:"el abrigo",de:"der Mantel",cat:"Kleidung",hint:"[el abr\u00edgo]"},
+  {es:"los zapatos",de:"die Schuhe",cat:"Kleidung",hint:"[los ssap\u00e1tos]"},
+  {es:"los calcetines",de:"die Socken",cat:"Kleidung",hint:"[los kalssset\u00ednes]"},
+  {es:"el sombrero",de:"der Hut",cat:"Kleidung",hint:"[el sombr\u00e9ro]"},
+  {es:"la camisa",de:"das Hemd",cat:"Kleidung",hint:"[la kam\u00edsa]"},
+  {es:"el jersey",de:"der Pullover",cat:"Kleidung",hint:"[elchers\u00e9i]"},
+  {es:"el gorro",de:"die M\u00fctze",cat:"Kleidung",hint:"[el g\u00f3rro]"},
+  {es:"la bufanda",de:"der Schal",cat:"Kleidung",hint:"[la buf\u00e1nda]"},
+  {es:"los guantes",de:"die Handschuhe",cat:"Kleidung",hint:"[los gu\u00e1ntes]"},
+  {es:"el cintur\u00f3n",de:"der G\u00fcrtel",cat:"Kleidung",hint:"[el ssintur\u00f3n]"},
+  {es:"las zapatillas",de:"die Turnschuhe",cat:"Kleidung",hint:"[las ssapat\u00edjas]"},
+  {es:"la ropa interior",de:"die Unterw\u00e4sche",cat:"Kleidung",hint:"[la rr\u00f3pa interj\u00f3r]"},
+  {es:"los vaqueros",de:"die Jeans",cat:"Kleidung",hint:"[los wak\u00e9ros]"},
+  {es:"la corbata",de:"die Krawatte",cat:"Kleidung",hint:"[la korb\u00e1ta]"},
+  {es:"las botas",de:"die Stiefel",cat:"Kleidung",hint:"[las b\u00f3tas]"},
+  {es:"las gafas de sol",de:"die Sonnenbrille",cat:"Kleidung",hint:"[las g\u00e1fas de sol]"},
+  {es:"el traje",de:"der Anzug",cat:"Kleidung",hint:"[el tr\u00e1che]"},
+  {es:"la sudadera",de:"der Hoodie",cat:"Kleidung",hint:"[la sudad\u00e9ra]"},
+  {es:"el bolso",de:"die Handtasche",cat:"Kleidung",hint:"[el b\u00f3lso]"},
+  {es:"el pijama",de:"der Schlafanzug",cat:"Kleidung",hint:"[el pich\u00e1ma]"},
+  {es:"el traje de ba\u00f1o",de:"der Badeanzug",cat:"Kleidung",hint:"[el tr\u00e1che de b\u00e1njo]"},
+  {es:"la ropa",de:"die Kleidung",cat:"Kleidung",hint:"[la rr\u00f3pa]"},
+  {es:"ponerse",de:"anziehen",cat:"Kleidung",hint:"[pon\u00e9rse]"},
+  {es:"quitarse",de:"ausziehen",cat:"Kleidung",hint:"[kit\u00e1rse]"},
+  {es:"llevar",de:"tragen (Kleidung)",cat:"Kleidung",hint:"[jew\u00e1r]"},
+
+  // === FARBEN (Colores) ===
+  {es:"rojo / roja",de:"rot",cat:"Farben",hint:"[rr\u00f3cho / rr\u00f3cha] \u2014 m. / f."},
+  {es:"azul",de:"blau",cat:"Farben",hint:"[ass\u00fal] \u2014 gleich f\u00fcr m. und f."},
+  {es:"verde",de:"gr\u00fcn",cat:"Farben",hint:"[w\u00e9rde] \u2014 gleich f\u00fcr m. und f."},
+  {es:"amarillo / amarilla",de:"gelb",cat:"Farben",hint:"[amar\u00edjo / amar\u00edja] \u2014 m. / f."},
+  {es:"blanco / blanca",de:"wei\u00df",cat:"Farben",hint:"[bl\u00e1nko / bl\u00e1nka] \u2014 m. / f."},
+  {es:"negro / negra",de:"schwarz",cat:"Farben",hint:"[n\u00e9gro / n\u00e9gra] \u2014 m. / f."},
+  {es:"naranja",de:"orange",cat:"Farben",hint:"[nar\u00e1ncha] \u2014 unver\u00e4nderlich"},
+  {es:"morado / morada",de:"lila",cat:"Farben",hint:"[mor\u00e1do / mor\u00e1da] \u2014 m. / f."},
+  {es:"rosa",de:"rosa / pink",cat:"Farben",hint:"[rr\u00f3sa] \u2014 unver\u00e4nderlich"},
+  {es:"marr\u00f3n",de:"braun",cat:"Farben",hint:"[marr\u00f3n] \u2014 unver\u00e4nderlich"},
+  {es:"gris",de:"grau",cat:"Farben",hint:"[gris] \u2014 gleich f\u00fcr m. und f."},
+  {es:"dorado / dorada",de:"golden",cat:"Farben",hint:"[dor\u00e1do / dor\u00e1da] \u2014 m. / f."},
+  {es:"plateado / plateada",de:"silbern",cat:"Farben",hint:"[plate\u00e1do / plate\u00e1da] \u2014 m. / f."},
+  {es:"claro / clara",de:"hell",cat:"Farben",hint:"[kl\u00e1ro] \u2014 azul claro = hellblau"},
+  {es:"oscuro / oscura",de:"dunkel",cat:"Farben",hint:"[osk\u00faro] \u2014 verde oscuro = dunkelgr\u00fcn"},
+  {es:"el color",de:"die Farbe",cat:"Farben",hint:"[el kol\u00f3r]"},
+  {es:"de colores",de:"farbig / bunt",cat:"Farben",hint:"[de kol\u00f3res]"},
+  {es:"\u00bfDe qu\u00e9 color es?",de:"Welche Farbe hat es?",cat:"Farben",hint:"[de k\u00e9 kol\u00f3r es]"},
+  {es:"azul claro",de:"hellblau",cat:"Farben",hint:"[ass\u00fal kl\u00e1ro]"},
+  {es:"verde oscuro",de:"dunkelgr\u00fcn",cat:"Farben",hint:"[w\u00e9rde osk\u00faro]"},
+
+  // === PRONOMEN ===
+  {es:"yo",de:"ich",cat:"Pronomen",hint:"[jo]"},
+  {es:"t\u00fa",de:"du",cat:"Pronomen",hint:"[tu] \u2014 mit Akzent!"},
+  {es:"\u00e9l",de:"er",cat:"Pronomen",hint:"[el] \u2014 mit Akzent!"},
+  {es:"ella",de:"sie (weiblich)",cat:"Pronomen",hint:"[\u00e9ja]"},
+  {es:"usted",de:"Sie (H\u00f6flichkeit, Sg.)",cat:"Pronomen",hint:"[ust\u00e9d] \u2014 Verb in 3. Person!"},
+  {es:"nosotros / nosotras",de:"wir",cat:"Pronomen",hint:"[nos\u00f3tros / nos\u00f3tras] \u2014 m. / f."},
+  {es:"vosotros / vosotras",de:"ihr",cat:"Pronomen",hint:"[wos\u00f3tros] \u2014 nur in Spanien!"},
+  {es:"ellos / ellas",de:"sie (Plural)",cat:"Pronomen",hint:"[\u00e9jos / \u00e9jas] \u2014 m. / f."},
+  {es:"ustedes",de:"Sie (H\u00f6flichkeit, Pl.)",cat:"Pronomen",hint:"[ust\u00e9des] \u2014 in Lateinamerika auch f\u00fcr \u201eihr\u201c"},
+  {es:"me",de:"mich / mir",cat:"Pronomen",hint:"[me] \u2014 Me llamo Ana."},
+  {es:"te",de:"dich / dir",cat:"Pronomen",hint:"[te] \u2014 Te quiero."},
+  {es:"nos",de:"uns",cat:"Pronomen",hint:"[nos] \u2014 Nos vemos."},
+  {es:"mi / mis",de:"mein / meine",cat:"Pronomen",hint:"[mi / mis] \u2014 mi casa, mis amigos"},
+  {es:"tu / tus",de:"dein / deine",cat:"Pronomen",hint:"[tu / tus] \u2014 ohne Akzent!"},
+  {es:"su / sus",de:"sein / ihr / Ihr",cat:"Pronomen",hint:"[su / sus] \u2014 f\u00fcr \u00e9l, ella, usted..."},
+  {es:"nuestro / nuestra",de:"unser / unsere",cat:"Pronomen",hint:"[nu\u00e9stro / nu\u00e9stra]"},
+  {es:"este / esta",de:"dieser / diese",cat:"Pronomen",hint:"[\u00e9ste / \u00e9sta] \u2014 este libro"},
+  {es:"ese / esa",de:"jener / jene",cat:"Pronomen",hint:"[\u00e9se / \u00e9sa] \u2014 ese chico"},
+  {es:"algo",de:"etwas",cat:"Pronomen",hint:"[\u00e1lgo] \u2014 \u00bfQuieres algo?"},
+  {es:"nada",de:"nichts",cat:"Pronomen",hint:"[n\u00e1da] \u2014 No quiero nada."},
+
+  // === VERBEN ===
+  {es:"ser",de:"sein (dauerhaft)",cat:"Verben",hint:"[ser] \u2014 yo soy, t\u00fa eres, \u00e9l es"},
+  {es:"estar",de:"sein (Zustand/Ort)",cat:"Verben",hint:"[est\u00e1r] \u2014 yo estoy, t\u00fa est\u00e1s"},
+  {es:"tener",de:"haben",cat:"Verben",hint:"[ten\u00e9r] \u2014 yo tengo, t\u00fa tienes"},
+  {es:"hacer",de:"machen / tun",cat:"Verben",hint:"[ass\u00e9r] \u2014 yo hago, t\u00fa haces"},
+  {es:"ir",de:"gehen",cat:"Verben",hint:"[ir] \u2014 yo voy, t\u00fa vas, \u00e9l va"},
+  {es:"venir",de:"kommen",cat:"Verben",hint:"[wen\u00edr] \u2014 yo vengo, t\u00fa vienes"},
+  {es:"comer",de:"essen",cat:"Verben",hint:"[kom\u00e9r] \u2014 yo como, t\u00fa comes"},
+  {es:"beber",de:"trinken",cat:"Verben",hint:"[beb\u00e9r] \u2014 yo bebo, t\u00fa bebes"},
+  {es:"hablar",de:"sprechen",cat:"Verben",hint:"[abl\u00e1r] \u2014 yo hablo, t\u00fa hablas"},
+  {es:"aprender",de:"lernen",cat:"Verben",hint:"[aprend\u00e9r] \u2014 yo aprendo"},
+  {es:"querer",de:"wollen / lieben",cat:"Verben",hint:"[ker\u00e9r] \u2014 yo quiero, t\u00fa quieres"},
+  {es:"poder",de:"k\u00f6nnen",cat:"Verben",hint:"[pod\u00e9r] \u2014 yo puedo, t\u00fa puedes"},
+  {es:"dormir",de:"schlafen",cat:"Verben",hint:"[dorm\u00edr] \u2014 yo duermo"},
+  {es:"comprar",de:"kaufen",cat:"Verben",hint:"[kompr\u00e1r] \u2014 yo compro"},
+  {es:"vivir",de:"leben / wohnen",cat:"Verben",hint:"[wiw\u00edr] \u2014 yo vivo, t\u00fa vives"},
+  {es:"trabajar",de:"arbeiten",cat:"Verben",hint:"[trabach\u00e1r] \u2014 yo trabajo"},
+  {es:"leer",de:"lesen",cat:"Verben",hint:"[le\u00e9r] \u2014 yo leo, t\u00fa lees"},
+  {es:"escribir",de:"schreiben",cat:"Verben",hint:"[eskrib\u00edr] \u2014 yo escribo"},
+  {es:"ver",de:"sehen",cat:"Verben",hint:"[wer] \u2014 yo veo, t\u00fa ves"},
+  {es:"saber",de:"wissen",cat:"Verben",hint:"[sab\u00e9r] \u2014 yo s\u00e9 \u2014 \u00a1No s\u00e9!"},
+  {es:"dar",de:"geben",cat:"Verben",hint:"[dar] \u2014 yo doy, t\u00fa das"},
+  {es:"pagar",de:"bezahlen",cat:"Verben",hint:"[pag\u00e1r] \u2014 yo pago"},
+  {es:"abrir",de:"\u00f6ffnen",cat:"Verben",hint:"[abr\u00edr] \u2014 yo abro"},
+  {es:"cerrar",de:"schlie\u00dfen",cat:"Verben",hint:"[sserr\u00e1r] \u2014 yo cierro"},
+  {es:"necesitar",de:"brauchen",cat:"Verben",hint:"[nessessit\u00e1r] \u2014 yo necesito"},
+  {es:"gustar",de:"gefallen / m\u00f6gen",cat:"Verben",hint:"[gust\u00e1r] \u2014 me gusta / me gustan"},
+  {es:"llamarse",de:"hei\u00dfen",cat:"Verben",hint:"[jam\u00e1rse] \u2014 Me llamo..."},
+  {es:"hay",de:"es gibt",cat:"Verben",hint:"[ai] \u2014 unver\u00e4nderlich"},
+  {es:"entender",de:"verstehen",cat:"Verben",hint:"[entend\u00e9r] \u2014 yo entiendo"},
+  {es:"jugar",de:"spielen",cat:"Verben",hint:"[chug\u00e1r] \u2014 yo juego"}
+];
+
+// State
+var deck = [];
+var currentIndex = 0;
+var isFlipped = false;
+var shuffled = false;
+var direction = 'es-de';
+var activeCategories = new Set();
+var activeFilter = 'all';
+var ratings = {};
+
+var STORAGE_KEY = 'es_de_flashcards';
+var categories = [];
+var catSet = new Set();
+for (var i = 0; i < allCards.length; i++) {
+  if (!catSet.has(allCards[i].cat)) {
+    catSet.add(allCards[i].cat);
+    categories.push(allCards[i].cat);
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      ratings: ratings,
+      shuffled: shuffled,
+      direction: direction,
+      activeFilter: activeFilter,
+      activeCategories: Array.from(activeCategories),
+      currentIndex: currentIndex
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    var d = JSON.parse(raw);
+    if (d.ratings) ratings = d.ratings;
+    if (d.shuffled !== undefined) shuffled = d.shuffled;
+    if (d.direction) direction = d.direction;
+    if (d.activeFilter) activeFilter = d.activeFilter;
+    if (d.activeCategories) activeCategories = new Set(d.activeCategories);
+    if (d.currentIndex !== undefined) currentIndex = d.currentIndex;
+    return true;
+  } catch(e) { return false; }
+}
+
+function init() {
+  var loaded = loadState();
+  if (!loaded) {
+    for (var i = 0; i < categories.length; i++) {
+      activeCategories.add(categories[i]);
+    }
+  }
+  document.getElementById('btnShuffle').classList.toggle('active', shuffled);
+  document.getElementById('btnDirection').textContent = direction === 'es-de' ? 'ES \u2192 DE' : 'DE \u2192 ES';
+  document.getElementById('dirLabel').textContent = direction === 'es-de' ? 'Spanisch \u2192 Deutsch' : 'Deutsch \u2192 Spanisch';
+  document.getElementById('filterSelect').value = activeFilter;
+  buildCategoryGrid();
+  rebuildDeck();
+  if (loaded) {
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && saved.currentIndex !== undefined && saved.currentIndex < deck.length) {
+        currentIndex = saved.currentIndex;
+      }
+    } catch(e) {}
+  }
+  showCard();
+}
+
+function buildCategoryGrid() {
+  var grid = document.getElementById('catGrid');
+  var html = '';
+  for (var i = 0; i < categories.length; i++) {
+    var cat = categories[i];
+    var count = 0;
+    for (var j = 0; j < allCards.length; j++) {
+      if (allCards[j].cat === cat) count++;
+    }
+    var isActive = activeCategories.has(cat);
+    html += '<button class="cat-btn' + (isActive ? ' active' : '') + '" onclick="toggleCategory(\'' + cat + '\', this)">' + cat + ' <span class="cat-count">' + count + '</span></button>';
+  }
+  grid.innerHTML = html;
+}
+
+function toggleCategory(cat, btn) {
+  if (activeCategories.has(cat)) {
+    if (activeCategories.size <= 1) return;
+    activeCategories.delete(cat);
+    btn.classList.remove('active');
+  } else {
+    activeCategories.add(cat);
+    btn.classList.add('active');
+  }
+  rebuildDeck();
+  showCard();
+  saveState();
+}
+
+function rebuildDeck() {
+  var filtered = [];
+  for (var i = 0; i < allCards.length; i++) {
+    if (activeCategories.has(allCards[i].cat)) {
+      filtered.push(allCards[i]);
+    }
+  }
+  deck = [];
+  for (var i = 0; i < filtered.length; i++) {
+    var origIdx = allCards.indexOf(filtered[i]);
+    var card = {};
+    for (var k in filtered[i]) card[k] = filtered[i][k];
+    card.origIdx = origIdx;
+    deck.push(card);
+  }
+  if (activeFilter !== 'all') {
+    var temp = [];
+    for (var i = 0; i < deck.length; i++) {
+      var r = ratings[deck[i].origIdx];
+      if (activeFilter === 'unlearned' && !r) temp.push(deck[i]);
+      else if (r === activeFilter) temp.push(deck[i]);
+    }
+    deck = temp;
+  }
+  if (shuffled) shuffle(deck);
+  currentIndex = 0;
+}
+
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+}
+
+function toggleShuffle() {
+  shuffled = !shuffled;
+  document.getElementById('btnShuffle').classList.toggle('active', shuffled);
+  rebuildDeck();
+  showCard();
+  saveState();
+}
+
+function toggleDirection() {
+  direction = direction === 'es-de' ? 'de-es' : 'es-de';
+  document.getElementById('btnDirection').textContent = direction === 'es-de' ? 'ES \u2192 DE' : 'DE \u2192 ES';
+  document.getElementById('dirLabel').textContent = direction === 'es-de' ? 'Spanisch \u2192 Deutsch' : 'Deutsch \u2192 Spanisch';
+  showCard();
+  saveState();
+}
+
+function setFilter(val) {
+  activeFilter = val;
+  rebuildDeck();
+  showCard();
+  saveState();
+}
+
+function togglePanel(name) {
+  var panels = ['categories', 'stats', 'list'];
+  for (var i = 0; i < panels.length; i++) {
+    var p = panels[i];
+    var id = p === 'categories' ? 'categoryPanel' : p === 'stats' ? 'statsPanel' : 'listPanel';
+    var el = document.getElementById(id);
+    if (p === name) el.classList.toggle('show');
+    else el.classList.remove('show');
+  }
+  if (name === 'stats') updateStats();
+  if (name === 'list') renderList();
+}
+
+function updateStats() {
+  var correct = 0, unsure = 0, wrong = 0;
+  for (var k in ratings) {
+    if (ratings[k] === 'correct') correct++;
+    else if (ratings[k] === 'unsure') unsure++;
+    else if (ratings[k] === 'wrong') wrong++;
+  }
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statUnsure').textContent = unsure;
+  document.getElementById('statWrong').textContent = wrong;
+}
+
+function renderList() {
+  var query = document.getElementById('searchInput').value.toLowerCase();
+  var container = document.getElementById('listItems');
+  var items = [];
+  for (var i = 0; i < allCards.length; i++) {
+    if (activeCategories.has(allCards[i].cat)) items.push(allCards[i]);
+  }
+  if (query) {
+    var temp = [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].es.toLowerCase().indexOf(query) >= 0 || items[i].de.toLowerCase().indexOf(query) >= 0) {
+        temp.push(items[i]);
+      }
+    }
+    items = temp;
+  }
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var origIdx = allCards.indexOf(items[i]);
+    var r = ratings[origIdx];
+    var dotClass = r === 'correct' ? 'green' : r === 'unsure' ? 'orange' : r === 'wrong' ? 'red' : 'none';
+    html += '<div class="list-item" onclick="jumpToCard(' + origIdx + ')">' +
+      '<span class="es">' + items[i].es + '</span>' +
+      '<span style="display:flex;align-items:center"><span class="de">' + items[i].de + '</span><span class="status-dot ' + dotClass + '"></span></span>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function jumpToCard(origIdx) {
+  for (var i = 0; i < deck.length; i++) {
+    if (deck[i].origIdx === origIdx) {
+      currentIndex = i;
+      showCard();
+      document.getElementById('listPanel').classList.remove('show');
+      return;
+    }
+  }
+}
+
+function showCard() {
+  var cardArea = document.getElementById('cardArea');
+  var completeScreen = document.getElementById('completeScreen');
+
+  if (deck.length === 0) {
+    cardArea.style.display = 'none';
+    completeScreen.classList.add('show');
+    document.getElementById('completeText').textContent = 'Keine Karten in dieser Auswahl. \u00c4ndere den Filter oder die Kategorien.';
+    updateProgress();
+    return;
+  }
+
+  if (currentIndex >= deck.length) {
+    cardArea.style.display = 'none';
+    completeScreen.classList.add('show');
+    var correct = 0;
+    for (var k in ratings) { if (ratings[k] === 'correct') correct++; }
+    document.getElementById('completeText').textContent = 'Du hast alle ' + deck.length + ' Karten durchgearbeitet! ' + correct + ' von ' + allCards.length + ' insgesamt gewusst.';
+    updateProgress();
+    return;
+  }
+
+  cardArea.style.display = 'flex';
+  completeScreen.classList.remove('show');
+
+  var card = deck[currentIndex];
+  isFlipped = false;
+  document.getElementById('cardInner').classList.remove('flipping');
+  document.querySelector('.card-front').classList.remove('hidden');
+  document.querySelector('.card-back').classList.add('hidden');
+
+  var frontWord = direction === 'es-de' ? card.es : card.de;
+  var backWord = direction === 'es-de' ? card.de : card.es;
+  var frontLang = direction === 'es-de' ? 'Espa\u00f1ol' : 'Deutsch';
+  var backLang = direction === 'es-de' ? 'Deutsch' : 'Espa\u00f1ol';
+  var frontHint = direction === 'es-de' ? (card.hint || '') : '';
+  var backHint = direction === 'es-de' ? '' : (card.hint || '');
+
+  document.getElementById('cardFrontWord').textContent = frontWord;
+  document.getElementById('cardFrontWord').className = 'card-word' + (frontWord.length > 25 ? ' xlong' : frontWord.length > 16 ? ' long' : '');
+  document.getElementById('cardBackWord').textContent = backWord;
+  document.getElementById('cardBackWord').className = 'card-word' + (backWord.length > 25 ? ' xlong' : backWord.length > 16 ? ' long' : '');
+
+  document.getElementById('cardFrontHint').textContent = frontHint;
+  document.getElementById('cardBackHint').textContent = backHint;
+
+  document.getElementById('cardNumFront').textContent = '#' + (card.origIdx + 1);
+  document.getElementById('cardNumBack').textContent = '#' + (card.origIdx + 1);
+  document.getElementById('cardCatFront').textContent = card.cat;
+  document.getElementById('cardCatBack').textContent = card.cat;
+
+  document.querySelector('.card-front .card-flag').textContent = frontLang;
+  document.querySelector('.card-back .card-flag').textContent = backLang;
+
+  var front = document.querySelector('.card-front');
+  var back = document.querySelector('.card-back');
+  if (direction === 'es-de') {
+    front.style.background = 'linear-gradient(145deg, #8b0000, #c60b1e 50%, #a00a18)';
+    back.style.background = 'linear-gradient(145deg, #1a1a2e, #2d2d44 50%, #1a1a2e)';
+  } else {
+    front.style.background = 'linear-gradient(145deg, #1a1a2e, #2d2d44 50%, #1a1a2e)';
+    back.style.background = 'linear-gradient(145deg, #8b0000, #c60b1e 50%, #a00a18)';
+  }
+
+  document.getElementById('btnPrev').disabled = currentIndex === 0;
+  document.getElementById('tapHint').textContent = 'Tippen zum Umdrehen';
+  updateProgress();
+}
+
+function flipCard() {
+  var inner = document.getElementById('cardInner');
+  var front = document.querySelector('.card-front');
+  var back = document.querySelector('.card-back');
+
+  inner.classList.add('flipping');
+  setTimeout(function() {
+    isFlipped = !isFlipped;
+    if (isFlipped) {
+      front.classList.add('hidden');
+      back.classList.remove('hidden');
+    } else {
+      back.classList.add('hidden');
+      front.classList.remove('hidden');
+    }
+    inner.classList.remove('flipping');
+    document.getElementById('tapHint').textContent = isFlipped ? 'Wie gut wusstest du es?' : 'Tippen zum Umdrehen';
+  }, 350);
+}
+
+function rateCard(rating) {
+  if (deck.length === 0 || currentIndex >= deck.length) return;
+  var card = deck[currentIndex];
+  ratings[card.origIdx] = rating;
+  saveState();
+
+  var wrapper = document.getElementById('cardWrapper');
+  wrapper.classList.add('animating-out');
+  setTimeout(function() {
+    wrapper.classList.remove('animating-out');
+    currentIndex++;
+    showCard();
+    wrapper.classList.add('animating-in');
+    setTimeout(function() { wrapper.classList.remove('animating-in'); }, 250);
+  }, 200);
+}
+
+function nextCard() {
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    showCard();
+    saveState();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showCard();
+    saveState();
+  }
+}
+
+function updateProgress() {
+  var total = deck.length;
+  var current = Math.min(currentIndex + 1, total);
+  var pct = total > 0 ? Math.round((currentIndex / total) * 100) : 0;
+  document.getElementById('progressText').textContent = total > 0 ? 'Karte ' + current + ' von ' + total : 'Keine Karten';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function restart() {
+  currentIndex = 0;
+  if (shuffled) shuffle(deck);
+  document.getElementById('completeScreen').classList.remove('show');
+  showCard();
+  saveState();
+}
+
+function resetProgress() {
+  if (!confirm('Fortschritt wirklich zur\u00fccksetzen? Alle Bewertungen werden gel\u00f6scht.')) return;
+  ratings = {};
+  currentIndex = 0;
+  activeFilter = 'all';
+  document.getElementById('filterSelect').value = 'all';
+  rebuildDeck();
+  showCard();
+  updateStats();
+  saveState();
+}
+
+// Touch swipe support
+var touchStartX = 0;
+document.getElementById('cardWrapper').addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+document.getElementById('cardWrapper').addEventListener('touchend', function(e) {
+  var diff = e.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(diff) > 60) {
+    if (diff < 0) nextCard();
+    else prevCard();
+    e.preventDefault();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
